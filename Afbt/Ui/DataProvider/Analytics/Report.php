@@ -29,7 +29,6 @@ class Report extends AbstractDataProvider
      * @param ProductCollectionFactory $collectionFactory
      * @param array $meta
      * @param array $data
-     * @param PoolInterface|null $modifiersPool
      */
     public function __construct(
         $name,
@@ -37,11 +36,9 @@ class Report extends AbstractDataProvider
         $requestFieldName,
         ProductCollectionFactory $collectionFactory,
         array $meta = [],
-        array $data = [],
-        PoolInterface $modifiersPool = null
+        array $data = []
     )
     {
-        $this->modifiersPool = $modifiersPool ?: ObjectManager::getInstance()->get(PoolInterface::class);
         $this->collection = $collectionFactory->create();
         $this->collection->getSelect()->join("quote_item", "quote_item.product_id = e.entity_id and quote_item.from_afbt = 1", ["added_to_cart" => "SUM(quote_item.from_afbt)"]);
         $this->collection->getSelect()->joinLeft("sales_order_item", "sales_order_item.product_id = e.entity_id and quote_item.from_afbt = 1", ["ordered" => "SUM(sales_order_item.from_afbt)"]);
@@ -65,10 +62,6 @@ class Report extends AbstractDataProvider
             'items' => array_values($items),
         ];
 
-        /** @var ModifierInterface $modifier */
-        foreach ($this->modifiersPool->getModifiersInstances() as $modifier) {
-            $data = $modifier->modifyData($data);
-        }
         return $data;
     }
 }
