@@ -12,7 +12,7 @@
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
     <menu>
-        <add id="Codilar_Afbt::codilar"
+        <!--<add id="Codilar_Afbt::codilar"
              title="Frequently Bought Together"
              translate="title"
              module="Codilar_Afbt"
@@ -26,6 +26,6 @@
              parent="Codilar_Afbt::codilar"
              sortOrder="20"
              resource="Codilar_Afbt::report"
-             action="afbt/report/fetch"/>
+             action="afbt/report/fetch"/>-->
     </menu>
 </config>
