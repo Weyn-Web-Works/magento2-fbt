@@ -84,11 +84,13 @@ class Index extends \Magento\Framework\App\Action\Action
                 $productCollection->addAttributeToFilter(\Magento\Catalog\Model\Product::VISIBILITY, Visibility::VISIBILITY_BOTH);
                 $rankArray = [];
                 foreach ($productCollection as $product) {
-                    $match = 0;
-                    foreach ($attributeArray as $attribute) {
-                        $match = $match + $this->getNumberOfWordMatch($parentProduct->getData($attribute),$product->getData($attribute));
+                    if($product->isSalable()) {
+                        $match = 0;
+                        foreach ($attributeArray as $attribute) {
+                            $match = $match + $this->getNumberOfWordMatch($parentProduct->getData($attribute), $product->getData($attribute));
+                        }
+                        $rankArray[$product->getId()] = $match;
                     }
-                    $rankArray[$product->getId()] = $match;
                 }
                 unset($rankArray[$pid]);
                 arsort($rankArray);

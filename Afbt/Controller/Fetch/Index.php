@@ -83,24 +83,14 @@ class Index extends Action
             $associatedIds = array_unique($afbtIndex->getAspIdsArray());
             $parentProduct = $this->helper->getProduct($productId);
             $associatedProductData = [];
-            $associatedProductData["status"] = true;
-            $associatedProductData["parent_product"] = [
-                "parent_product_id" => null,
-                "id" => $productId,
-                "name" => $parentProduct->getName(),
-                "url" => $parentProduct->getProductUrl(),
-                "image" => $this->helper->getProductImage($parentProduct),
-                "price_html" => $this->productHelper->getProductPriceHtml($parentProduct),
-                "price" => $this->productHelper->getPrice($parentProduct),
-                "add_to_cart_url" => $this->getAddToCartUrl($parentProduct)
-            ];
+            $associatedProductData["associated_products"] = [];
             if ($associatedIds) {
                 foreach ($associatedIds as $associatedId) {
                     if (!$associatedId) {
                         continue;
                     }
                     $product = $this->helper->getProduct($associatedId);
-                    if ($product) {
+                    if ($product && $product->isSalable()) {
                         $associatedProductData["associated_products"][] = [
                             "parent_product_id" => $productId,
                             "id" => $associatedId,
@@ -114,6 +104,22 @@ class Index extends Action
                         ];
                     }
                 }
+            }
+            if (count($associatedProductData["associated_products"]) > 0) {
+                $associatedProductData["status"] = true;
+                $associatedProductData["parent_product"] = [
+                    "parent_product_id" => null,
+                    "id" => $productId,
+                    "name" => $parentProduct->getName(),
+                    "url" => $parentProduct->getProductUrl(),
+                    "image" => $this->helper->getProductImage($parentProduct),
+                    "price_html" => $this->productHelper->getProductPriceHtml($parentProduct),
+                    "price" => $this->productHelper->getPrice($parentProduct),
+                    "add_to_cart_url" => $this->getAddToCartUrl($parentProduct)
+                ];
+            }
+            else {
+                $associatedProductData["false"] = true;
             }
             return $this->jsonFactory->create()->setData($associatedProductData);
         } catch (NoSuchEntityException $e) {
