@@ -10,7 +10,7 @@
  */
 -->
 <% if (productsData.status) { %>
-    <h2 id="scroll-to">Frequently Bought Together</h2>
+    <h2 id="scroll-to">Andere klanten kochten ook</h2>
     <div class="fbt-container">
         <div class="row-fbt owl-carousel owl-theme" id="fbt-carousel-blog">
             <% productsData.associated_products.forEach(function(associatedProduct) { %>
@@ -52,7 +52,7 @@
                     <div class="row-fbt row-mod-block">
                         <div class="block-container column-2">
                             <div class="grant-total">
-                                <label>Combo Price</label>
+                                <label>Combo</label>
                                 <p class="price"><%= associatedProduct.total_price %></p>
                             </div>
                         </div>
@@ -61,8 +61,8 @@
                                 <form name="addToCartForm" id="add_cart_<%= associatedProduct.id %>" action="" method="POST">
                                     <input type="hidden" name="product_parent" value="<%= productsData.parent_product.id %>" />
                                     <input type="hidden" name="product_associated" value="<%= associatedProduct.id %>" />
-                                    <button type="button" class="action tocart primary afbt">
-                                        Add to Cart
+                                    <button type="button" class="button button--rectangle action tocart primary afbt">
+                                        + In winkelmandje
                                     </button>
                                 </form>
 
