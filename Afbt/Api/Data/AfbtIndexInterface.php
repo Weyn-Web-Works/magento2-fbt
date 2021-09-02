@@ -30,7 +30,7 @@ interface AfbtIndexInterface
      *
      * @return array|null
      */
-    public function getAspIdsArray();
+    public function getAspIdsArray(): ?array;
 
     /**
      * Set parent product id.

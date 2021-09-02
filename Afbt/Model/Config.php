@@ -46,9 +46,9 @@ class Config
      *
      * @return int
      */
-    public function getNoOfCombos()
+    public function getNoOfCombos(): int
     {
-        return $this->getValue("no_of_combo");
+        return intval($this->getValue("no_of_combo"));
     }
 
     /**

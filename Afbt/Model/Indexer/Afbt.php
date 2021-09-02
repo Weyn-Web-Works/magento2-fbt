@@ -101,34 +101,33 @@ class Afbt implements ActionInterface, MViewActionInterface
                         $quoteIds[] = $quoteItem->getOrderId();
                     }
                 }
+
                 /** get quotes product ids */
                 $quoteItems = $helper->getOrderItemCollectionFactory();
                 $quoteItems->addFieldToFilter("order_id", ["in" => $quoteIds]);
                 $quoteProductIds = [];
                 if ($quoteItems->getSize()) {
                     foreach ($quoteItems as $quoteItem) {
-                        $quoteProductIds[] = $quoteItem->getProductId();
+                        if($quoteItem->getProductId() != $pid) {
+                            $quoteProductIds[] = $quoteItem->getProductId();
+                        }
                     }
                 }
 
                 /** sort $quoteProductIds by number of occurrences */
                 /** group by value (make it unique) */
                 $quoteProductIds = $helper->getWeightSortedArray($quoteProductIds);
-                /** if $pid is in this array, then remove it */
-                if (in_array($pid, $quoteProductIds)) {
-                    if (($key = array_search($pid, $quoteProductIds)) !== false) {
-                        unset($quoteProductIds[$key]);
-                    }
-                }
+
                 /** check config for no. of items and restrict array*/
-                $noOfCombos = intval($this->config->getNoOfCombos());
-                if (count($quoteProductIds) > $noOfCombos) {
-                    foreach ($quoteProductIds as $k => $v) {
-                        if ($k >= $noOfCombos) {
-                            unset($quoteProductIds[$k]);
-                        }
-                    }
-                }
+                //$noOfCombos = intval($this->config->getNoOfCombos());
+                //if (count($quoteProductIds) > $noOfCombos) {
+                //    foreach ($quoteProductIds as $k => $v) {
+                //        if ($k >= $noOfCombos) {
+                //            unset($quoteProductIds[$k]);
+                //        }
+                //    }
+                //}
+
                 /** implode array with coma */
                 $associatedProductIds = null;
                 if ($quoteProductIds) {

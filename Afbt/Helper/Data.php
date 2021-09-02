@@ -144,14 +144,7 @@ class Data extends AbstractHelper
     {
         $array = array_count_values($unsortedArray); //get all occurrences of each values
         arsort($array);
-        $sortedArray = [];
-
-        foreach($array as $key=>$val){ // iterate over occurrences array
-            for($i=0;$i<$val;$i++){ //apply loop based on occurrences number
-                $sortedArray[] = $key; // assign same name to the final array
-            }
-        }
-        return array_unique($sortedArray);
+        return array_keys($array);
     }
 
     /**

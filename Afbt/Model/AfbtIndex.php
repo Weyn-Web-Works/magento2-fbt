@@ -49,9 +49,9 @@ class AfbtIndex extends AbstractModel implements AfbtIndexInterface, IdentityInt
 
 
     /**
-     * @return array|null
+     * @inheritDoc
      */
-    public function getAspIdsArray()
+    public function getAspIdsArray(): ?array
     {
         if ($this->getAspIds()) {
             return explode(",", $this->getAspIds());

@@ -50,7 +50,7 @@ class InstallSchema implements InstallSchemaInterface
             )->addColumn(
                 'asp_ids',
                 Table::TYPE_TEXT,
-                10,
+                10000,
                 ['nullable' => false],
                 'Associated Product Ids'
             )->addForeignKey(

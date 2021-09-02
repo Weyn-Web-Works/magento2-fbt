@@ -11,11 +11,15 @@ namespace Codilar\Afbt\Controller\Fetch;
 
 use Codilar\Afbt\Api\AfbtIndexRepositoryInterface;
 use Codilar\Afbt\Helper\Data;
+use Codilar\Afbt\Model\Config;
 use Codilar\Core\Helper\Product;
+use Exception;
+use Magento\Catalog\Model\Product as CatalogProduct;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Reports\Block\Product\AbstractProduct;
 
@@ -41,6 +45,10 @@ class Index extends Action
      * @var JsonFactory
      */
     private $jsonFactory;
+    /**
+     * @var Config
+     */
+    private $config;
 
     /**
      * Index constructor.
@@ -50,6 +58,7 @@ class Index extends Action
      * @param AfbtIndexRepositoryInterface $afbtIndexRepository
      * @param Product $productHelper
      * @param AbstractProduct $abstractProduct
+     * @param Config $config
      * @param JsonFactory $jsonFactory
      */
     public function __construct(
@@ -58,6 +67,7 @@ class Index extends Action
         AfbtIndexRepositoryInterface $afbtIndexRepository,
         Product $productHelper,
         AbstractProduct $abstractProduct,
+        Config $config,
         JsonFactory $jsonFactory
     )
     {
@@ -67,12 +77,13 @@ class Index extends Action
         $this->abstractProduct = $abstractProduct;
         parent::__construct($context);
         $this->jsonFactory = $jsonFactory;
+        $this->config = $config;
     }
 
     /**
      * Fetch frequently bought together products from the afbt_index table.
      *
-     * @return \Magento\Framework\Controller\ResultInterface|ResponseInterface
+     * @return ResultInterface|ResponseInterface
      */
     public function execute()
     {
@@ -80,12 +91,15 @@ class Index extends Action
         $productId = $data['product_id'];
         try {
             $afbtIndex = $this->afbtIndexRepository->getById($productId, "pp_id");
-            $associatedIds = array_unique($afbtIndex->getAspIdsArray());
+            $associatedIds = $afbtIndex->getAspIdsArray();
             $parentProduct = $this->helper->getProduct($productId);
             $associatedProductData = [];
             $associatedProductData["associated_products"] = [];
             if ($associatedIds) {
                 foreach ($associatedIds as $associatedId) {
+                    if(count($associatedProductData["associated_products"]) >= $this->config->getNoOfCombos()) {
+                        break;
+                    }
                     if (!$associatedId) {
                         continue;
                     }
@@ -122,9 +136,7 @@ class Index extends Action
                 $associatedProductData["false"] = true;
             }
             return $this->jsonFactory->create()->setData($associatedProductData);
-        } catch (NoSuchEntityException $e) {
-            return $this->jsonFactory->create()->setData(["status" => false, "message" => $e->getMessage()]);
-        } catch (\Exception $e) {
+        } catch (NoSuchEntityException | Exception $e) {
             return $this->jsonFactory->create()->setData(["status" => false, "message" => $e->getMessage()]);
         }
     }
@@ -132,10 +144,10 @@ class Index extends Action
     /**
      * Get product add to cart url.
      *
-     * @param \Magento\Catalog\Model\Product $product
+     * @param CatalogProduct $product
      * @return string
      */
-    protected function getAddToCartUrl($product)
+    protected function getAddToCartUrl(CatalogProduct $product): string
     {
         return $this->abstractProduct->getAddToCartUrl($product);
     }
