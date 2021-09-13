@@ -20,6 +20,7 @@ use Magento\Framework\App\Area;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Catalog\Block\Product\ImageBuilder;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Model\StoreManagerInterface;
 
 class Product extends AbstractHelper
@@ -73,7 +74,7 @@ class Product extends AbstractHelper
     public function getDiscount($_product)
     {
         /**
-         * @var $_product \Magento\Catalog\Model\Product
+         * @var $_product ProductModel
          */
         $originalPrice = $_product->getPrice();
         $finalPrice = $_product->getPriceInfo()->getPrice('final_price')->getAmount()->getValue();
@@ -119,31 +120,32 @@ class Product extends AbstractHelper
     }
 
     /**
-     * @param \Magento\Catalog\Model\Product $product
+     * @param ProductModel $product
      * @return string
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
-    public function getProductPriceHtml($product)
+    public function getProductPriceHtml(ProductModel $product): string
     {
-        $currency = $this->storeManager->getStore()->getCurrentCurrencyCode();
+        $currency = $this->storeManager->getStore()->getCurrentCurrency();
         $specialPrice = $product->getPriceInfo()->getPrice('final_price')->getValue();
         $oldPrice = $product->getPriceInfo()->getPrice('regular_price')->getValue();
+        $fop = $currency->format($oldPrice);
         $normalPriceHtml = "<div class='price-box price-final_price' data-role='priceBox' data-product-id='".$product->getId()."'><span class='price-container price-final_price tax weee'>
                             <span id='product-price-".$product->getId()."' data-price-amount=".$oldPrice." data-price-type='finalPrice' class='price-wrapper'>
-                            <span class='price'>".$currency. " ". $oldPrice."</span></span></span></div>";
+                            <span class='price'>".$fop."</span></span></span></div>";
         $specialPriceHtml = "<div class='price-box price-final_price' data-role='priceBox' data-product-id='".$product->getId()."'>
                             <span class='special-price'>
                             <span class='price-container price-final_price tax weee'>
                             <span class='price-label'>Special Price</span>
                             <span id='product-price-".$product->getId()."' data-price-amount='".$specialPrice."' data-price-type='finalPrice' class='price-wrapper '>
-                            <span class='price'>".$currency ." ". $specialPrice."</span></span>
+                            <span class='price'>".$currency->format($specialPrice)."</span></span>
                             </span>
                             </span>
                             <span class='old-price'>
                             <span class='price-container price-final_price tax weee'>
                             <span class='price-label'>Regular Price</span>
                             <span id='old-price".$product->getId()."' data-price-amount='".$specialPrice."' data-price-type='oldPrice' class='price-wrapper '>
-                            <span class='price'>".$currency ." ". $oldPrice."</span></span>
+                            <span class='price'>".$fop."</span></span>
                             </span>
                             </span>
                             </div>";
@@ -152,10 +154,10 @@ class Product extends AbstractHelper
 
 
     /**
-     * @param \Magento\Catalog\Model\Product $product
+     * @param ProductModel $product
      * @param bool $formatted
      * @return mixed
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getPrice($product, $formatted = false)
     {
@@ -171,7 +173,7 @@ class Product extends AbstractHelper
     /**
      * @param $price
      * @return string
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getFormattedPrice($price)
     {

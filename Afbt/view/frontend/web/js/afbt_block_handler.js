@@ -43,15 +43,15 @@ define(['jquery', 'underscore', 'owlCarousel'], function ($, _, owlCarousel) {
                                     navText: ['<div class="left-arrow">', '<div class="right-arrow">'],
                                     responsive:{
                                         0:{
-                                            items:1,
+                                            items:2,
                                             margin:0
                                         },
                                         600:{
-                                            items:1,
+                                            items:2,
                                             margin:0
                                         },
                                         1000:{
-                                            items:3
+                                            items:5
                                         }
                                     }
                                 });
