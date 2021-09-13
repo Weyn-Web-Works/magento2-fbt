@@ -9,7 +9,9 @@
  * @copyright Copyright (c) 2019
  */
 -->
-define(['jquery', 'underscore', 'owlCarousel'], function ($, _, owlCarousel) {
+define(['jquery', 'underscore', 'owlCarousel',
+        'mage/translate', "Glue_CustomPopup/js/showAddedToCartModal"],
+    function ($, _, owlCarousel, $t, showAddedToCartModal) {
     return function (config) {
         var Afbt = {
             fetchUrl: config.afbtFetchUrl,
@@ -81,21 +83,32 @@ define(['jquery', 'underscore', 'owlCarousel'], function ($, _, owlCarousel) {
                 });
             },
             processAddCart: function () {
-                var self = this;
+                let self = this;
                 $(document).on("click", ".afbt-container .action.tocart.primary.afbt", function () {
-                    var parentProductId = $(this).closest("form").find("[name='product_parent']").val();
-                    var associatedProductId = $(this).closest("form").find("[name='product_associated']").val();
-                    var products = [];
-                    products.push(parentProductId);
-                    products.push(associatedProductId);
-                    if (parentProductId && associatedProductId) {
+                    let $this = $(this);
+                    let $originalText = $this.text();
+                    $this.text($t('Adding...'));
+                    let $form = $this.closest("form");
+                    let associatedProductId = $form.find("[name='product_associated']").val();
+                    if (associatedProductId) {
+                        let products = [];
+                        products.push(associatedProductId);
                         $.ajax({
-                            url: self.cartAddUrl+"product/"+parentProductId+"/",
+                            url: self.cartAddUrl,
                             method: "POST",
-                            showLoader: true,
+                            showLoader: false,
                             data: {products: products, from_afbt: 1},
                             success: function (response) {
                                 console.log(response);
+                                $this.text($originalText);
+                                let $p = $form.parents(".pad-block");
+                                let $img = $p.find("img");
+                                showAddedToCartModal(
+                                    $img.attr("src"),
+                                    $img.parent("a").attr("title"),
+                                    "", "",
+                                    $p.find(".price-block").text().trim()
+                                );
                             }
                         });
                     }

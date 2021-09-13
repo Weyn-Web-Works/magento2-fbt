@@ -90,7 +90,7 @@ class Add extends Action
                     $this->cart->addProduct($product, $requestInfo);
                 }
                 $this->cart->save();
-                $this->messageManager->addSuccessMessage(__("You added the combo in cart!"));
+                //$this->messageManager->addSuccessMessage(__("You added the combo in cart!"));
                 return $this->jsonFactory->create()->setData(["status" => true, "message" => __("You added the combo in cart!")]);
             } catch (LocalizedException $e) {
                 $this->messageManager->addErrorMessage($e->getMessage());
