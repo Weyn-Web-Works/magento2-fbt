@@ -15,13 +15,13 @@ use Codilar\Afbt\Model\Config;
 use Codilar\Core\Helper\Product;
 use Exception;
 use Magento\Catalog\Model\Product as CatalogProduct;
+use Magento\Checkout\Helper\Cart;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Reports\Block\Product\AbstractProduct;
 
 class Index extends Action
 {
@@ -37,10 +37,12 @@ class Index extends Action
      * @var Product
      */
     private $productHelper;
+
     /**
-     * @var AbstractProduct
+     * @var Cart
      */
-    private $abstractProduct;
+    protected $_cartHelper;
+
     /**
      * @var JsonFactory
      */
@@ -57,7 +59,7 @@ class Index extends Action
      * @param Data $helper
      * @param AfbtIndexRepositoryInterface $afbtIndexRepository
      * @param Product $productHelper
-     * @param AbstractProduct $abstractProduct
+     * @param Cart $cartHelper
      * @param Config $config
      * @param JsonFactory $jsonFactory
      */
@@ -66,7 +68,7 @@ class Index extends Action
         Data $helper,
         AfbtIndexRepositoryInterface $afbtIndexRepository,
         Product $productHelper,
-        AbstractProduct $abstractProduct,
+        Cart $cartHelper,
         Config $config,
         JsonFactory $jsonFactory
     )
@@ -74,7 +76,7 @@ class Index extends Action
         $this->helper = $helper;
         $this->afbtIndexRepository = $afbtIndexRepository;
         $this->productHelper = $productHelper;
-        $this->abstractProduct = $abstractProduct;
+        $this->_cartHelper = $cartHelper;
         parent::__construct($context);
         $this->jsonFactory = $jsonFactory;
         $this->config = $config;
@@ -149,7 +151,7 @@ class Index extends Action
      */
     protected function getAddToCartUrl(CatalogProduct $product): string
     {
-        return $this->abstractProduct->getAddToCartUrl($product);
+        return $this->_cartHelper->getAddUrl($product);
     }
 
 
